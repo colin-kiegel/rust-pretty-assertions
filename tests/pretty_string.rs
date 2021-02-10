@@ -21,6 +21,19 @@ impl<'a> fmt::Debug for PrettyString<'a> {
 [32m>foo
 [0m
 "#)]
+#[cfg(not(feature = "git-style-diff"))]
+fn assert_eq_empty_first() {
+    assert_eq!(PrettyString(""), PrettyString("foo"));
+}
+
+#[test]
+#[should_panic(expected = r#"assertion failed: `(left == right)`
+
+[1mDiff[0m [31m- left[0m / [32mright +[0m :
+[32m+foo
+[0m
+"#)]
+#[cfg(feature = "git-style-diff")]
 fn assert_eq_empty_first() {
     pretty_assertions::assert_eq!(PrettyString(""), PrettyString("foo"));
 }

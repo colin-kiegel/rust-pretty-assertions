@@ -17,6 +17,10 @@ categories = ["development-tools"]
 keywords = ["assert", "diff", "pretty", "color"]
 readme = "README.md"
 
+[features]
+default = []
+git-style-diff = []
+
 [badges]
 travis-ci = { repository = "colin-kiegel/rust-pretty-assertions" }
 
