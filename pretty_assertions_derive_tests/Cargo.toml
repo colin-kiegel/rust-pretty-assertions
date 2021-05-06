@@ -1,0 +1,8 @@
+[package]
+name = "pretty_assertions_derive_tests"
+version = "0.1.0"
+edition = "2018"
+publish = false
+
+[dependencies]
+pretty_assertions_derive = { path = "../pretty_assertions_derive" }

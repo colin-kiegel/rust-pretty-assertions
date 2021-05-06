@@ -126,115 +126,89 @@ where
     }
 }
 
-/// Asserts that two expressions are equal to each other (using [`PartialEq`]).
-///
-/// On panic, this macro will print a diff derived from [`Debug`] representation of
-/// each value.
-///
-/// This is a drop in replacement for [`std::assert_eq!`].
-/// You can provide a custom panic message if desired.
-///
-/// # Examples
-///
-/// ```
-/// use pretty_assertions::assert_eq;
-///
-/// let a = 3;
-/// let b = 1 + 2;
-/// assert_eq!(a, b);
-///
-/// assert_eq!(a, b, "we are testing addition with {} and {}", a, b);
-/// ```
-#[macro_export]
-macro_rules! assert_eq {
-    ($left:expr, $right:expr$(,)?) => ({
-        $crate::assert_eq!(@ $left, $right, "", "");
-    });
-    ($left:expr, $right:expr, $($arg:tt)*) => ({
-        $crate::assert_eq!(@ $left, $right, ": ", $($arg)+);
-    });
-    (@ $left:expr, $right:expr, $maybe_semicolon:expr, $($arg:tt)*) => ({
-        match (&($left), &($right)) {
-            (left_val, right_val) => {
-                if !(*left_val == *right_val) {
-                    ::std::panic!("assertion failed: `(left == right)`{}{}\
-                       \n\
-                       \n{}\
-                       \n",
-                       $maybe_semicolon,
-                       format_args!($($arg)*),
-                       $crate::Comparison::new(left_val, right_val)
-                    )
-                }
-            }
-        }
-    });
+pretty_assertions_derive::derive_assert_eq! {
+    /// Asserts that two expressions are equal to each other (using [`PartialEq`]).
+    ///
+    /// On panic, this macro will print a diff derived from [`Debug`] representation of
+    /// each value.
+    ///
+    /// This is a drop in replacement for [`std::assert_eq!`].
+    /// You can provide a custom panic message if desired.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pretty_assertions::assert_eq;
+    ///
+    /// let a = 3;
+    /// let b = 1 + 2;
+    /// assert_eq!(a, b);
+    ///
+    /// assert_eq!(a, b, "we are testing addition with {} and {}", a, b);
+    /// ```
+    (assert_eq, |left_val, right_val, has_message, message| {
+        ::std::panic!("assertion failed: `(left == right)`{}{}\
+           \n\
+           \n{}\
+           \n",
+           if has_message { ": " } else { "" },
+           message,
+           $crate::Comparison::new(left_val, right_val)
+        )
+    })
 }
 
-/// Asserts that two expressions are not equal to each other (using [`PartialEq`]).
-///
-/// On panic, this macro will print the values of the expressions with their
-/// [`Debug`] representations.
-///
-/// This is a drop in replacement for [`std::assert_ne!`].
-/// You can provide a custom panic message if desired.
-///
-/// # Examples
-///
-/// ```
-/// use pretty_assertions::assert_ne;
-///
-/// let a = 3;
-/// let b = 2;
-/// assert_ne!(a, b);
-///
-/// assert_ne!(a, b, "we are testing that the values are not equal");
-/// ```
-#[macro_export]
-macro_rules! assert_ne {
-    ($left:expr, $right:expr$(,)?) => ({
-        $crate::assert_ne!(@ $left, $right, "", "");
-    });
-    ($left:expr, $right:expr, $($arg:tt)+) => ({
-        $crate::assert_ne!(@ $left, $right, ": ", $($arg)+);
-    });
-    (@ $left:expr, $right:expr, $maybe_semicolon:expr, $($arg:tt)+) => ({
-        match (&($left), &($right)) {
-            (left_val, right_val) => {
-                if *left_val == *right_val {
-                    let left_dbg = ::std::format!("{:?}", &*left_val);
-                    let right_dbg = ::std::format!("{:?}", &*right_val);
-                    if left_dbg != right_dbg {
-                        ::std::panic!("assertion failed: `(left != right)`{}{}\
-                            \n\
-                            \n{}\
-                            \n{}: According to the `PartialEq` implementation, both of the values \
-                              are partially equivalent, even if the `Debug` outputs differ.\
-                            \n\
-                            \n",
-                            $maybe_semicolon,
-                            format_args!($($arg)+),
-                            $crate::Comparison::new(left_val, right_val),
-                            $crate::Style::new()
-                                .bold()
-                                .underline()
-                                .paint("Note")
-                        )
-                    }
-
-                    ::std::panic!("assertion failed: `(left != right)`{}{}\
-                        \n\
-                        \n{}:\
-                        \n{:#?}\
-                        \n\
-                        \n",
-                        $maybe_semicolon,
-                        format_args!($($arg)+),
-                        $crate::Style::new().bold().paint("Both sides"),
-                        left_val
-                    )
-                }
-            }
+pretty_assertions_derive::derive_assert_ne! {
+    /// Asserts that two expressions are not equal to each other (using [`PartialEq`]).
+    ///
+    /// On panic, this macro will print the values of the expressions with their
+    /// [`Debug`] representations.
+    ///
+    /// This is a drop in replacement for [`std::assert_ne!`].
+    /// You can provide a custom panic message if desired.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use pretty_assertions::assert_ne;
+    ///
+    /// let a = 3;
+    /// let b = 2;
+    /// assert_ne!(a, b);
+    ///
+    /// assert_ne!(a, b, "we are testing that the values are not equal");
+    /// ```
+    (assert_ne, |left_val, right_val, has_message, message| {
+        let left_dbg = ::std::format!("{:?}", &*left_val);
+        let right_dbg = ::std::format!("{:?}", &*right_val);
+        if left_dbg != right_dbg {
+            ::std::panic!("assertion failed: `(left != right)`{}{}\
+                \n\
+                \n{}\
+                \n{}: According to the `PartialEq` implementation, both of the values \
+                  are partially equivalent, even if the `Debug` outputs differ.\
+                \n\
+                \n",
+                if has_message { ": " } else { "" },
+                message,
+                $crate::Comparison::new(left_val, right_val),
+                $crate::Style::new()
+                    .bold()
+                    .underline()
+                    .paint("Note")
+            )
         }
-    });
+
+        ::std::panic!("assertion failed: `(left != right)`{}{}\
+            \n\
+            \n{}:\
+            \n{:#?}\
+            \n\
+            \n",
+            if has_message { ": " } else { "" },
+            message,
+            $crate::Style::new().bold().paint("Both sides"),
+            left_val
+        )
+    })
 }

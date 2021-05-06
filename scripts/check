@@ -24,3 +24,4 @@ cargo doc --no-deps
 eprintln "Running examples"
 cargo run --example standard_assertion
 cargo run --example pretty_assertion
+cargo run --example assert_emoji

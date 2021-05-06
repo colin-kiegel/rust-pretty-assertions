@@ -23,6 +23,7 @@ travis-ci = { repository = "colin-kiegel/rust-pretty-assertions" }
 [dependencies]
 ansi_term = "0.12.1"
 diff = "0.1.12"
+pretty_assertions_derive = { version = "0.1.0", path = "../pretty_assertions_derive" }
 
 [target.'cfg(windows)'.dependencies]
 output_vt100 = "0.1.2"

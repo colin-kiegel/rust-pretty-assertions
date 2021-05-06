@@ -3,4 +3,6 @@
 members = [
     "pretty_assertions",
     "pretty_assertions_bench",
+    "pretty_assertions_derive",
+    "pretty_assertions_derive_tests",
 ]
